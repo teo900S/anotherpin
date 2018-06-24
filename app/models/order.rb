@@ -17,4 +17,44 @@ class Order < ApplicationRecord
   end
 
 
+  def save_and_charge
+    # check our data is valid
+    # if it is, charge in stripe
+    # if it isn't, then return false
+    # charge in stripe and save if all good
+    if self.valid?
+
+      Stripe::Charge.create(amount: self.total_price, currency: "usd", source: self.stripe_token,
+        description: "Order for " + self.email)
+
+       self.save
+    else
+      # doesn't pass validation
+      false
+    end
+
+  rescue Stripe::CardError => e
+
+    # this is from stripe
+    @message = e.json_body[:error][:message]
+
+    # then add to the model errors
+    self.errors.add(:stripe_token, @message)
+
+    #return false to our controller
+    false
+
+  end
+
+  def total_price
+      @total = 0
+
+      order_items.each do |item|
+        @total = @total + item.product.price * item.quantity
+
+      end
+      @total
+  end
+
+
 end

@@ -43,7 +43,7 @@ gem "fog-aws"
 gem 'devise'
 gem 'activeadmin'
 
-
+gem 'stripe'
 
 
 
