@@ -10,11 +10,15 @@ class Order < ApplicationRecord
 
   accepts_nested_attributes_for :order_items
 
+
+
+
   def add_from_cart(cart)
     cart.order_items.all.each do |item|
       self.order_items.new(product: item.product, quantity: item.quantity)
     end
   end
+
 
 
   def save_and_charge
@@ -46,6 +50,8 @@ class Order < ApplicationRecord
 
   end
 
+
+
   def total_price
       @total = 0
 
@@ -54,6 +60,18 @@ class Order < ApplicationRecord
 
       end
       @total
+  end
+
+
+
+  def total_price_in_dollars
+    @total = 0
+
+    order_items.all.each do |item|
+      @total = @total + item.product.price_in_dollars * item.quantity
+    end
+
+    @total
   end
 
 
